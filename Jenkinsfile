@@ -14,7 +14,7 @@ stages {
 
     stage('Checkout') {
         steps {
-            echo 'Checking out source code from GitHub...'
+            echo 'Checking out source code...'
 
             checkout([
                 $class: 'GitSCM',
@@ -46,7 +46,7 @@ stages {
 
     stage('Build Application') {
         steps {
-            echo 'Building Spring Boot application with Maven...'
+            echo 'Building Spring Boot application...'
 
             sh '''
                 mvn clean package -DskipTests
@@ -57,7 +57,7 @@ stages {
     stage('Verify JAR') {
         steps {
             sh '''
-                echo "===== Generated JAR ====="
+                echo "===== JAR FILE ====="
                 ls -lh target/*.jar
             '''
         }
@@ -95,7 +95,7 @@ stages {
 
     stage('Push Docker Image') {
         steps {
-            echo "Pushing Docker image: ${FULL_IMAGE}"
+            echo "Pushing ${FULL_IMAGE}..."
 
             sh '''
                 docker push ${FULL_IMAGE}
@@ -127,22 +127,20 @@ stages {
 
     stage('Verify Kubernetes Deployment') {
         steps {
-            echo 'Checking Kubernetes deployment...'
-
             sh '''
-                echo "===== Nodes ====="
+                echo "===== KUBERNETES NODES ====="
                 kubectl get nodes
 
-                echo "===== Deployment ====="
+                echo "===== DEPLOYMENT ====="
                 kubectl get deployment ms1deploy
 
-                echo "===== Pods ====="
+                echo "===== PODS ====="
                 kubectl get pods -o wide
 
-                echo "===== Service ====="
+                echo "===== SERVICE ====="
                 kubectl get service ms1service
 
-                echo "===== Running Image ====="
+                echo "===== CURRENT IMAGE ====="
                 kubectl get deployment ms1deploy \
                     -o jsonpath='{.spec.template.spec.containers[?(@.name=="m1")].image}'
                 echo
@@ -154,22 +152,22 @@ stages {
 post {
 
     success {
-        echo "=========================================="
-        echo "       CI/CD PIPELINE SUCCESSFUL"
-        echo "=========================================="
+        echo '=========================================='
+        echo '       CI/CD PIPELINE SUCCESSFUL'
+        echo '=========================================='
         echo "Docker Image: ${FULL_IMAGE}"
-        echo "Deployment: ms1deploy"
-        echo "Container: m1"
+        echo 'Deployment: ms1deploy'
+        echo 'Container: m1'
     }
 
     failure {
-        echo "=========================================="
-        echo "         CI/CD PIPELINE FAILED"
-        echo "=========================================="
+        echo '=========================================='
+        echo '         CI/CD PIPELINE FAILED'
+        echo '=========================================='
     }
 
     always {
-        echo "Pipeline completed. Build Number: ${BUILD_NUMBER}"
+        echo "Build Number: ${BUILD_NUMBER}"
     }
 }
 ```
